@@ -1,37 +1,17 @@
-from fastapi import FastAPI, HTTPException
-from typing import Optional, List, Dict
-from pydantic import BaseModel
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+from fastapi import Request
 
 app = FastAPI()
 
-class User(BaseModel):
-    id: int
-    name: str
-    age: int
+# Подключаем статические файлы
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
-class Post(BaseModel):
-    id: int
-    title: str
-    body: str
-    author: User
+# Настраиваем Jinja2 для работы с шаблонами
+templates = Jinja2Templates(directory="templates")
 
-class PostCreate(BaseModel):
-    title: str
-    body: str
-    author_id: int
-
-users = [
-    {'id':1, 'name':'John','age':34},
-    {'id':2, 'name':'Max','age':25},
-    {'id':3, 'name':'Mark','age':17}
-]
-
-posts = [
-    {'id':1, 'title':'News 1', 'body':'Text 1', 'author': users[1]},
-    {'id':2, 'title':'News 2', 'body':'Text 2', 'author': users[0]},
-    {'id':3, 'title':'News 3', 'body':'Text 3', 'author': users[2]}
-]
-
-@app.get('/items')
-async def items() -> List[Post]:
-    return [Post(**post) for post in posts]
+@app.get("/", response_class=HTMLResponse)
+async def read_root(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
