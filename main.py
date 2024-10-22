@@ -6,10 +6,10 @@ from fastapi import Request
 
 app = FastAPI()
 
-# Подключаем статические файлы
+# вкл статик
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# Настраиваем Jinja2 для работы с шаблонами
+# Настраиваем джинжы
 templates = Jinja2Templates(directory="templates")
 
 @app.get("/", response_class=HTMLResponse)
